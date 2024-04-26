@@ -1,0 +1,1 @@
+# manas-news-notifications
