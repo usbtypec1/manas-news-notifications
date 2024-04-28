@@ -12,10 +12,12 @@ from typing import Final, TypeAlias
 import httpx
 from bs4 import BeautifulSoup, Tag
 
-TELEGRAM_BOT_TOKEN: Final[str] = 'token'
-CHAT_USERNAME: Final[int] = 0
+TELEGRAM_BOT_TOKEN: Final[str] = (
+    'your token'
+)
+CHAT_USERNAME: Final[str] = 'chat id or username'
 
-DATABASE_FILE_PATH = pathlib.Path(__file__).parent / 'database.db'
+DATABASE_FILE_PATH = pathlib.Path(__file__).parent / 'manas_news.db'
 
 
 class Locale(enum.StrEnum):
@@ -93,8 +95,9 @@ class NewsService:
         self.__http_client = http_client
 
     def get_news(self) -> list[NewsArticle]:
-        url = f'https://manas.edu.kg/{self.__locale}'
-        response = self.__http_client.get(url)
+        query_params = {'page': 1}
+        url = f'https://manas.edu.kg/{self.__locale}/news'
+        response = self.__http_client.get(url, params=query_params)
 
         soup = BeautifulSoup(response.text, 'lxml')
 
@@ -126,9 +129,8 @@ class NewsService:
             news_id = int(short_link.split('/')[-1])
             title = anchor.text.strip()
 
-            article_date = datetime.datetime.strptime(
+            article_date = datetime.date.fromisoformat(
                 article_body.find_all('span')[-1].text.strip(),
-                '%d.%m.%Y',
             )
 
             news_article = NewsArticle(
